@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Million123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Million123! -Q "SELECT 1" -C
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    networks:
+      - million_network
+
+  auth-api:
+    build:
+      context: .
+      dockerfile: Auth.API/Dockerfile
+    image: million-auth-api:latest
+    container_name: auth-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DbSetting__ConnectionString=Server=sqlserver;Database=MillionAuthDb;User Id=sa;Password=Million123!;TrustServerCertificate=true
+      - SecurityKey=Million.Property.Management.InternalKey
+    ports:
+      - "5001:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - million_network
+
+  properties-api:
+    build:
+      context: .
+      dockerfile: Properties.API/Dockerfile
+    image: million-properties-api:latest
+    container_name: properties-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DbSetting__ConnectionString=Server=sqlserver;Database=MillionPropertiesDb;User Id=sa;Password=Million123!;TrustServerCertificate=true
+      - SecurityKey=Million.Property.Management.InternalKey
+    ports:
+      - "5002:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - million_network
+
+volumes:
+  sql_data:
+
+networks:
+  million_network:
+    driver: bridge

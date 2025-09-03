@@ -1,8 +1,14 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.OData;
+using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
 using Properties.API.Automapper;
+using Properties.Application.Dto;
 using Properties.Application.Handlers;
 using Properties.Domain.Services;
 using Properties.Domain.Services.Contracts;
@@ -46,6 +52,40 @@ builder.Services.AddFluentValidationClientsideAdapters();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 #endregion
 
+
+#region Odata
+static IEdmModel GetModel()
+{
+    ODataConventionModelBuilder builder = new();
+    builder.EntitySet<PropertyReadDto>("PropertyData");
+    return builder.GetEdmModel();
+}
+
+void AddFormatters(IServiceCollection services)
+{
+    services.AddMvcCore(option =>
+    {
+        foreach (var outputFormatter in option.OutputFormatters.OfType<ODataOutputFormatter>().Where(_ => _.SupportedMediaTypes.Count == 0))
+        {
+            outputFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/prs.odatatestxx-odata"));
+        }
+
+        foreach (var inputFormatter in option.InputFormatters.OfType<ODataInputFormatter>().Where(_ => _.SupportedMediaTypes.Count == 0))
+        {
+            inputFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/prs.odatatestxx-odata"));
+        }
+    });
+}
+
+builder.Services.AddControllers().AddOData((op, df) =>
+{
+    op.Expand().Filter().OrderBy().Select().SetMaxTop(100);
+    op.AddRouteComponents(GetModel());
+});
+
+AddFormatters(builder.Services);
+#endregion
+
 // Database configuration
 var dbSettings = new DbSettings();
 builder.Configuration.Bind("DbSetting", dbSettings);
@@ -59,11 +99,7 @@ builder.Services.AddTransient<IPropertyImageDomainService, PropertyImageDomainSe
 builder.Services.AddTransient<IPropertyTraceDomainService, PropertyTraceDomainService>();
 #endregion
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreatePropertyHandler).Assembly));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdatePropertyHandler).Assembly));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateImageHandler).Assembly));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateOwnerHandler).Assembly));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdatePropertyPriceHandler).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetPropertiesHandler).Assembly));
 
 var app = builder.Build();
 

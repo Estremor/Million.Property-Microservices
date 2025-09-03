@@ -2,7 +2,6 @@ using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Properties.Application.Commands;
-using Properties.Application.Dto;
 using Properties.Domain.Entities;
 using Properties.Domain.Services.Contracts;
 using Shared.Domain.Base;

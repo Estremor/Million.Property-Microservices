@@ -30,3 +30,7 @@
 /Millionandup.PropertyManagement.Microservices/TestMillionandup.Property/bin/Debug/net9.0
 /Millionandup.PropertyManagement.Microservices/TestMillionandup.Property/obj
 /Millionandup.PropertyManagement.Microservices/.vs/Millionandup.PropertyManagement.Microservices/v17
+/Millionandup.PropertyManagement.Microservices/Auth.API/bin/Debug/net9.0
+/Millionandup.PropertyManagement.Microservices/Auth.Application/bin/Debug/net9.0
+/Millionandup.PropertyManagement.Microservices/Auth.Domain/bin/Debug/net9.0
+/Millionandup.PropertyManagement.Microservices/Auth.Infrastructure/bin/Debug/net9.0

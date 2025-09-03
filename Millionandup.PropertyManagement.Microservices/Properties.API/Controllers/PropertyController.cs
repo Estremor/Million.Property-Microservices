@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Properties.API.Filter;
 using Properties.Application.Commands;
-using Properties.Application.Dto;
+using Properties.Application.Queries;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,18 +21,24 @@ namespace Properties.API.Controllers
         #endregion
 
         #region C'tor
-        public PropertyController(IMediator mediator) => _mediator = mediator;
+        public PropertyController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
         #endregion
 
 
         #region Methods
         // GET: api/<PropertyController>
-        //[HttpGet]
-        //[EnableQuery]
-        //public IEnumerable<PropertyReadDto> Get()
-        //{
-        //    return _propertyAppService.List();
-        //}
+        [HttpGet]
+        [EnableQuery]
+        [AllowAnonymous]
+        public async Task<IActionResult> Get()
+        {
+            var query = new GetPropertiesQuery();
+            var result = await _mediator.Send(query);
+            return Ok(result);
+        }
 
         // POST api/<PropertyController>
         [HttpPost]

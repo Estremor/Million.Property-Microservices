@@ -1,11 +1,11 @@
 using Properties.Application.Commands;
 using Properties.Domain.Entities;
 using Properties.Domain.Services.Contracts;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Shared.Infrastructure.Base;
 using Shared.Infrastructure.Errors;
 using System.Net;
+using MediatR;
 
 namespace Properties.Application.Handlers
 {

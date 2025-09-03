@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Domain.Base.Contract;
-using System.Diagnostics.Contracts;
 
 namespace Shared.Infrastructure.Base
 {

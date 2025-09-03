@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Properties.Application.Commands;
-using Properties.Application.Dto;
 
 namespace Properties.API.ModelState;
 
